@@ -18,16 +18,31 @@ def myeval(stuff):
     global myarray
     count = 0
     if stuff[0] == 'while':
-        while myarray.myget() != 0:
+        while myarray.myget() > 0:
             myeval(stuff[1])
-    while count < len(stuff):
+    while count < len(stuff) and stuff[0] != 'while':
         if stuff[count] == '[':
+            leftcount = 1
+            rightcount = 0
+            stptr = count+1
+            while leftcount > rightcount:
+                if stuff[stptr] == '[':
+                    leftcount += 1
+                if stuff[stptr] == ']':
+                    rightcount += 1
+                stptr += 1
+                if stptr >= len(stuff) and leftcount > rightcount: 
+                    print "Missing closing ]"
+                    quit()
+                
             myind = count
-            myend = stuff[count:].index(']')+len(stuff[:count])
-            newstuff = stuff[myind+1:myend]
-            del stuff[myind:myend]
+            myend = stptr
+            newstuff = stuff[myind+1:myend-1] #stptr is guaranteed to inc by 1 after equality; exlusive slicing 
+            #del stuff[myind:myend]
+            count += len(stuff[myind:myend])-1
             myeval(['while',newstuff])
         elif stuff[count] == ']':
+            print stuff
             raise SyntaxError("wroooooooooong")
         elif stuff[count] == '+':
             myarray.myset(myarray.myget()+1)
